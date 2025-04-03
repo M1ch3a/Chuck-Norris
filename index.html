@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuck Norris Jokes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="container">
+        <h1>Chuck Norris Jokes</h1>
+        <div id="joke">
+            <h2>Random Joke</h2>
+            <p id="joke-text">Click the button to get a joke!</p>
+            <button id="new-joke">Get New Joke</button>
+        </div>
+        <div id="categories">
+            <h2>Categories</h2>
+            <ul id="category-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        const jokeText = document.getElementById("joke-text");
+        const newJokeButton = document.getElementById("new-joke");
+        const categoryList = document.getElementById("category-list");
+
+        function fetchRandomJoke() {
+            fetch("https://api.chucknorris.io/jokes/random")
+                .then(response => response.json())
+                .then(data => {
+                    jokeText.textContent = data.value;
+                })
+                .catch(error => console.error("Error fetching joke:", error));
+        }
+
+        function fetchCategories() {
+            fetch("https://api.chucknorris.io/jokes/categories")
+                .then(response => response.json())
+                .then(data => {
+                    categoryList.innerHTML = data
+                        .map(category => `<li class="category-item">${category}</li>`)
+                        .join("");
+                    addCategoryClickListeners();
+                })
+                .catch(error => console.error("Error fetching categories:", error));
+        }
+
+        function fetchJokeByCategory(category) {
+            fetch(`https://api.chucknorris.io/jokes/random?category=${category}`)
+                .then(response => response.json())
+                .then(data => {
+                    jokeText.textContent = data.value;
+                })
+                .catch(error => console.error("Error fetching joke by category:", error));
+        }
+
+        function addCategoryClickListeners() {
+            const categoryItems = document.querySelectorAll(".category-item");
+            categoryItems.forEach(item => {
+                item.addEventListener("click", () => {
+                    fetchJokeByCategory(item.textContent);
+                });
+            });
+        }
+
+        newJokeButton.addEventListener("click", fetchRandomJoke);
+
+        fetchRandomJoke();
+        fetchCategories();
+    </script>
+</body>
+</html>
